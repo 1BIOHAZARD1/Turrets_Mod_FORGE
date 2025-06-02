@@ -12,10 +12,8 @@ import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.level.Level;
 
 public class TurretHeadEntity extends Entity {
-
     public TurretHeadEntity(EntityType<? extends TurretHeadEntity> type, Level level) {
         super(type, level);
-        this.noPhysics = true; // щоб левітував
     }
 
     @Override
@@ -30,11 +28,6 @@ public class TurretHeadEntity extends Entity {
     @Override
     public void tick() {
         super.tick();
-        setPos(getX(), getY(), getZ()); // фіксуємо позицію, щоб не падав
-    }
-
-    @Override
-    public boolean isPickable() {
-        return true;
+        // логіка левітації/обертання тощо
     }
 }

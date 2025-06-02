@@ -16,9 +16,8 @@ public class ModEntities {
     public static final RegistryObject<EntityType<TurretHeadEntity>> TURRET_HEAD =
             ENTITY_TYPES.register("turret_head", () ->
                     EntityType.Builder.<TurretHeadEntity>of(TurretHeadEntity::new, MobCategory.MISC)
-                            .sized(0.6f, 0.6f) // розмір голови турелі
-                            .setTrackingRange(64)
-                            .setUpdateInterval(1)
-                            .build(new ResourceLocation(TurretsMod.MOD_ID, "turret_head").toString())
-            );
+                            .sized(0.6F, 0.6F)
+                            .clientTrackingRange(8)
+                            .build("turret_head"));
 }
+
