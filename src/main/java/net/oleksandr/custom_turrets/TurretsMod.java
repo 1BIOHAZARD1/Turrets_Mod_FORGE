@@ -1,7 +1,9 @@
 package net.oleksandr.custom_turrets;
 
-import net.minecraft.world.item.ItemStack;
+import com.mojang.logging.LogUtils;
+import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
@@ -12,16 +14,12 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-
-import net.minecraft.client.renderer.entity.EntityRenderers;
-import com.mojang.logging.LogUtils;
-import org.slf4j.Logger;
-
 import net.oleksandr.custom_turrets.client.renderer.TurretHeadRenderer;
-import net.oleksandr.custom_turrets.registry.ModBlocks;
-import net.oleksandr.custom_turrets.registry.ModBlockEntities;
-import net.oleksandr.custom_turrets.registry.ModEntities;
-import net.oleksandr.custom_turrets.registry.ModItems;
+import net.oleksandr.custom_turrets.registry.*;
+import net.oleksandr.custom_turrets.registry.ModCreativeTabs;
+
+
+import org.slf4j.Logger;
 
 @Mod(TurretsMod.MOD_ID)
 public class TurretsMod {
@@ -34,9 +32,12 @@ public class TurretsMod {
         // Реєстрація
         ModBlocks.register(modEventBus);
         ModItems.register(modEventBus);
-        ModBlockEntities.register(modEventBus); // ВИПРАВЛЕНО
+        ModBlockEntities.register(modEventBus);
         ModEntities.ENTITY_TYPES.register(modEventBus);
+        ModCreativeTabs.register(modEventBus); // 👈 Тепер все правильно
 
+
+        // Події
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::addCreative);
 
@@ -44,22 +45,20 @@ public class TurretsMod {
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
-        // для спільної ініціалізації
+        // Для загального сетапу
     }
 
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
+        // Додаткове додавання до стандартних вкладок (наприклад Functional)
         if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
-            ModBlocks.TURRET_BLOCK.ifPresent(block -> {
-                event.accept(block.asItem()); // ✅ Правильний спосіб
-            });
+            //ModBlocks.TURRET_BLOCK.ifPresent(block ->
+            //        event.accept(new ItemStack(block.asItem(), 1)));
         }
     }
 
-
-
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
-        // додатково за потреби
+        // Можна залишити порожнім
     }
 
     @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
