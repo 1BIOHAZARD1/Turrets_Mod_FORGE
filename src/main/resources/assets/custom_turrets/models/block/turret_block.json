@@ -1,6 +1,11 @@
 {
-  "parent": "minecraft:block/cube_all",
+  "parent": "block/cube",
   "textures": {
-    "all": "custom_turrets:block/turret_block"
+    "down": "custom_turrets:block/turret_block_down",
+    "up": "custom_turrets:block/turret_block_up",
+    "north": "custom_turrets:block/turret_block_north",
+    "south": "custom_turrets:block/turret_block_south",
+    "west": "custom_turrets:block/turret_block_west",
+    "east": "custom_turrets:block/turret_block_east"
   }
 }

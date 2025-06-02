@@ -1,8 +1,7 @@
 {
   "variants": {
-    "facing=north": { "model": "custom_turrets:block/turret_block" },
-    "facing=south": { "model": "custom_turrets:block/turret_block", "y": 180 },
-    "facing=west":  { "model": "custom_turrets:block/turret_block", "y": 270 },
-    "facing=east":  { "model": "custom_turrets:block/turret_block", "y": 90 }
+    "": {
+      "model": "custom_turrets:block/turret_block"
+    }
   }
 }
