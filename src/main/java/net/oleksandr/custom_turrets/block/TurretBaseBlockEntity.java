@@ -8,11 +8,6 @@ import net.oleksandr.custom_turrets.registry.ModBlockEntities;
 public class TurretBaseBlockEntity extends BlockEntity {
 
     public TurretBaseBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlockEntities.TURRET_BASE_BLOCK_ENTITY.get(), pos, state);
-
-    }
-
-    public void tick() {
-        // Логіка обертання/стрільби
+        super(ModBlockEntities.TURRET_BASE.get(), pos, state);
     }
 }
