@@ -30,11 +30,13 @@ public class TurretsMod {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
         // Реєстрація
+
+        ModMenus.register(modEventBus);
         ModBlocks.register(modEventBus);
         ModItems.register(modEventBus);
         ModBlockEntities.register(modEventBus);
         ModEntities.ENTITY_TYPES.register(modEventBus);
-        ModCreativeTabs.register(modEventBus); // 👈 Тепер все правильно
+        ModCreativeTabs.register(modEventBus);
 
 
         // Події
@@ -59,15 +61,5 @@ public class TurretsMod {
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
         // Можна залишити порожнім
-    }
-
-    @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-    public static class ClientModEvents {
-        @SubscribeEvent
-        public static void onClientSetup(FMLClientSetupEvent event) {
-            event.enqueueWork(() -> {
-                EntityRenderers.register(ModEntities.TURRET_HEAD.get(), TurretHeadRenderer::new);
-            });
-        }
     }
 }

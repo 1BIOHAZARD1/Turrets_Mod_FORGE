@@ -1,5 +1,9 @@
 package net.oleksandr.custom_turrets.block;
 
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.core.BlockPos;
@@ -12,6 +16,8 @@ import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraftforge.network.NetworkHooks;
 import net.oleksandr.custom_turrets.block.TurretBaseBlockEntity;
 import net.oleksandr.custom_turrets.registry.ModBlockEntities;
 import javax.annotation.Nullable;
@@ -21,6 +27,18 @@ public class TurretBaseBlock extends Block implements EntityBlock {
     public TurretBaseBlock() {
         super(BlockBehaviour.Properties.of().strength(2.0f));
     }
+
+    @Override
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        if (!level.isClientSide) {
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof TurretBaseBlockEntity turretEntity) {
+                NetworkHooks.openScreen((ServerPlayer) player, turretEntity, pos);
+            }
+        }
+        return InteractionResult.SUCCESS;
+    }
+
 
     @Nullable
     @Override
