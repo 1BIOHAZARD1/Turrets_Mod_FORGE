@@ -9,7 +9,10 @@ import net.oleksandr.custom_turrets.TurretsMod;
 import net.oleksandr.custom_turrets.entity.TurretHeadEntity;
 
 public class TurretHeadRenderer extends EntityRenderer<TurretHeadEntity> {
-    private static final ResourceLocation TEXTURE = new ResourceLocation(TurretsMod.MOD_ID, "textures/entity/turret_head.png");
+
+    // Texture location for the turret head entity
+    private static final ResourceLocation TEXTURE =
+            new ResourceLocation(TurretsMod.MOD_ID, "textures/entity/turret_head.png");
 
     public TurretHeadRenderer(EntityRendererProvider.Context context) {
         super(context);
@@ -18,7 +21,7 @@ public class TurretHeadRenderer extends EntityRenderer<TurretHeadEntity> {
     @Override
     public void render(TurretHeadEntity entity, float yaw, float partialTicks, PoseStack poseStack,
                        MultiBufferSource bufferSource, int packedLight) {
-        // Поки що нічого не рендеримо
+        // No rendering logic yet — model or geometry not implemented
     }
 
     @Override

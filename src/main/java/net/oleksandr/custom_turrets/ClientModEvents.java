@@ -11,16 +11,17 @@ import net.oleksandr.custom_turrets.client.screen.TurretBaseScreen;
 import net.oleksandr.custom_turrets.registry.ModEntities;
 import net.oleksandr.custom_turrets.registry.ModMenus;
 
+// Subscribes to client-side mod events
 @Mod.EventBusSubscriber(modid = TurretsMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ClientModEvents {
 
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
-            // Реєстрація GUI
+            // Registers the GUI screen for the turret base block
             MenuScreens.register(ModMenus.TURRET_BASE_MENU.get(), TurretBaseScreen::new);
 
-            // Реєстрація рендера для TurretHead Entity
+            // Registers the renderer for the TurretHeadEntity
             EntityRenderers.register(ModEntities.TURRET_HEAD.get(), TurretHeadRenderer::new);
         });
     }
