@@ -64,6 +64,7 @@ public class TurretBaseBlock extends Block implements EntityBlock {
 
         if (!level.isClientSide) {
             TurretHeadEntity turretHead = new TurretHeadEntity(ModEntities.TURRET_HEAD.get(), level);
+            turretHead.setBasePos(pos);
             turretHead.moveTo(pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5, 0, 0);
             level.addFreshEntity(turretHead);
         }

@@ -8,10 +8,14 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.oleksandr.custom_turrets.block.TurretBaseBlockEntity;
+import javax.annotation.Nullable;
+
 
 public class TurretHeadEntity extends Entity {
 
     private BlockPos basePos;
+    private int ticksSinceSpawn = 0;
 
     public TurretHeadEntity(EntityType<? extends TurretHeadEntity> type, Level level) {
         super(type, level);
@@ -22,6 +26,15 @@ public class TurretHeadEntity extends Entity {
         this.basePos = basePos;
         this.setPos(basePos.getX() + 0.5, basePos.getY() + 1.0, basePos.getZ() + 0.5);
     }
+
+    @Nullable
+    public TurretBaseBlockEntity getBaseEntity() {
+        if (basePos != null && this.level().getBlockEntity(basePos) instanceof TurretBaseBlockEntity be) {
+            return be;
+        }
+        return null;
+    }
+
 
     @Override
     protected void defineSynchedData() {}
@@ -48,12 +61,25 @@ public class TurretHeadEntity extends Entity {
 
         if (this.level().isClientSide) return;
 
-        // Постійно "прилипати" до позиції бази
+        ticksSinceSpawn++;
+
         if (basePos != null) {
             this.setPos(basePos.getX() + 0.5, basePos.getY() + 1.0, basePos.getZ() + 0.5);
         }
 
-        // Проста логіка наведення на ціль
+        // Дати 40 тік (2 секунди) на пошук бази
+        if (ticksSinceSpawn > 40) {
+            TurretBaseBlockEntity base = getBaseEntity();
+            if (base != null) {
+                // Turret працює
+            } else {
+                System.out.println("Base not found! Removing turret head.");
+                this.discard();
+                return;
+            }
+        }
+
+        // Проста логіка наведення
         LivingEntity target = this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(8.0),
                         e -> e != null && e.isAlive() && !e.getType().equals(this.getType()))
                 .stream().findFirst().orElse(null);
@@ -62,6 +88,7 @@ public class TurretHeadEntity extends Entity {
             this.lookAt(target);
         }
     }
+
 
     private void lookAt(LivingEntity target) {
         double dx = target.getX() - this.getX();

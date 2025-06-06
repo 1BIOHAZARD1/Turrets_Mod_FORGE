@@ -1,5 +1,6 @@
 package net.oleksandr.custom_turrets.menu;
 
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -9,6 +10,8 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.Level;
 import net.oleksandr.custom_turrets.block.TurretBaseBlockEntity;
 import net.oleksandr.custom_turrets.registry.ModMenus;
+import net.minecraft.world.inventory.Slot;
+
 
 /**
  * Server-side container logic for the Turret Base block.
@@ -35,6 +38,16 @@ public class TurretBaseMenu extends AbstractContainerMenu {
 
         this.blockEntity = entity;
         this.level = inv.player.level();
+
+        // Turret's own inventory (3x3)
+        SimpleContainer container = blockEntity.toContainer();
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 3; col++) {
+                this.addSlot(new Slot(container, col + row * 3, 62 + col * 18, 17 + row * 18));
+            }
+        }
+
+
 
         // Player inventory and hotbar slots will be shown in the GUI
         // TODO: Add custom slots for turret input/output when inventory is implemented
