@@ -19,9 +19,61 @@ import net.oleksandr.custom_turrets.menu.TurretBaseMenu;
 
 
 
-public class TurretBaseBlockEntity extends BlockEntity implements MenuProvider {
+public class TurretBaseBlockEntity extends BlockEntity implements MenuProvider, net.minecraft.world.Container {
+
 
     private final NonNullList<ItemStack> items = NonNullList.withSize(9, ItemStack.EMPTY); // інвентар на 9 слотів
+
+    @Override
+    public int getContainerSize() {
+        return items.size();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        for (ItemStack stack : items) {
+            if (!stack.isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public ItemStack getItem(int index) {
+        return items.get(index);
+    }
+
+    @Override
+    public ItemStack removeItem(int index, int count) {
+        ItemStack result = ContainerHelper.removeItem(items, index, count);
+        if (!result.isEmpty()) {
+            setChanged(); // позначити що блок оновився
+        }
+        return result;
+    }
+
+    @Override
+    public ItemStack removeItemNoUpdate(int index) {
+        return ContainerHelper.takeItem(items, index);
+    }
+
+    @Override
+    public void setItem(int index, ItemStack stack) {
+        items.set(index, stack);
+        setChanged();
+    }
+
+    @Override
+    public void clearContent() {
+        items.clear();
+    }
+
+    @Override
+    public boolean stillValid(Player player) {
+        return true; // або можеш зробити перевірку на дистанцію
+    }
+
 
     public TurretBaseBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.TURRET_BASE.get(), pos, state);

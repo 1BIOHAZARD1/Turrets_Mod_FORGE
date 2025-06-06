@@ -40,12 +40,12 @@ public class TurretBaseMenu extends AbstractContainerMenu {
         this.level = inv.player.level();
 
         // Turret's own inventory (3x3)
-        SimpleContainer container = blockEntity.toContainer();
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 3; col++) {
-                this.addSlot(new Slot(container, col + row * 3, 62 + col * 18, 17 + row * 18));
+                this.addSlot(new Slot(blockEntity, col + row * 3, 62 + col * 18, 18 + row * 18));
             }
         }
+
 
 
 
@@ -61,7 +61,7 @@ public class TurretBaseMenu extends AbstractContainerMenu {
     private void addPlayerInventory(Inventory inv) {
         for (int row = 0; row < 3; ++row) {
             for (int col = 0; col < 9; ++col) {
-                this.addSlot(new Slot(inv, col + row * 9 + 9, 8 + col * 18, 84 + row * 18));
+                this.addSlot(new Slot(inv, col + row * 9 + 9, 8 + col * 18, 140 + row * 18));
             }
         }
     }
@@ -71,7 +71,7 @@ public class TurretBaseMenu extends AbstractContainerMenu {
 
     private void addPlayerHotbar(Inventory inv) {
         for (int col = 0; col < 9; ++col) {
-            this.addSlot(new Slot(inv, col, 8 + col * 18, 142));
+            this.addSlot(new Slot(inv, col, 8 + col * 18, 198));
         }
     }
 
