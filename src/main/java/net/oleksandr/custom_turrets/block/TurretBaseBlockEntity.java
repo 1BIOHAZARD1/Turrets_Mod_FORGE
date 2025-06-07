@@ -25,11 +25,59 @@ public class TurretBaseBlockEntity extends BlockEntity implements MenuProvider, 
 
     private final NonNullList<ItemStack> items = NonNullList.withSize(9, ItemStack.EMPTY); // інвентар на 9 слотів
 
-    private final ItemStackHandler itemHandler = new ItemStackHandler(9); // приклад
 
     public ItemStackHandler getInventory() {
-        return itemHandler;
+        return new ItemStackHandler(9) {
+            @Override
+            protected void onContentsChanged(int slot) {
+                setChanged(); // позначити, що щось змінилось
+            }
+
+            @Override
+            public int getSlots() {
+                return items.size();
+            }
+
+            @Override
+            public ItemStack getStackInSlot(int slot) {
+                return items.get(slot);
+            }
+
+            @Override
+            public void setStackInSlot(int slot, ItemStack stack) {
+                items.set(slot, stack);
+                onContentsChanged(slot);
+            }
+
+            @Override
+            public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+                ItemStack existing = items.get(slot);
+                if (!existing.isEmpty()) return stack; // слот зайнятий — нічого не вставляємо
+
+                if (!simulate) {
+                    items.set(slot, stack);
+                    onContentsChanged(slot);
+                }
+
+                return ItemStack.EMPTY;
+            }
+
+            @Override
+            public ItemStack extractItem(int slot, int amount, boolean simulate) {
+                ItemStack stack = items.get(slot);
+                if (stack.isEmpty()) return ItemStack.EMPTY;
+
+                ItemStack result = stack.split(amount);
+                if (!simulate) {
+                    items.set(slot, stack);
+                    onContentsChanged(slot);
+                }
+                return result;
+            }
+        };
     }
+
+
 
 
 

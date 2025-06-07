@@ -25,6 +25,7 @@ import net.oleksandr.custom_turrets.block.TurretBaseBlockEntity;
 import net.oleksandr.custom_turrets.entity.TurretHeadEntity;
 import net.oleksandr.custom_turrets.registry.ModBlockEntities;
 import net.oleksandr.custom_turrets.registry.ModEntities;
+import net.minecraftforge.entity.IEntityAdditionalSpawnData;
 
 import javax.annotation.Nullable;
 import java.util.List;
