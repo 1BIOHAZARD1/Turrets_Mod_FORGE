@@ -1,25 +1,57 @@
 package net.oleksandr.custom_turrets.entity;
 
+import com.mojang.authlib.GameProfile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.common.util.FakePlayerFactory;
+import net.minecraftforge.entity.IEntityAdditionalSpawnData;
+import net.minecraftforge.items.ItemStackHandler;
 import net.oleksandr.custom_turrets.block.TurretBaseBlockEntity;
+import net.oleksandr.custom_turrets.entity.ai.TurretAiming;
+import net.oleksandr.custom_turrets.entity.ai.TurretShooting;
+import org.slf4j.Logger;
+import com.mojang.logging.LogUtils;
+
 import javax.annotation.Nullable;
+import java.util.UUID;
 
+public class TurretHeadEntity extends Entity implements IEntityAdditionalSpawnData {
 
-public class TurretHeadEntity extends Entity {
+    private static final Logger LOGGER = LogUtils.getLogger();
+    private static final GameProfile DUMMY_PROFILE =
+            new GameProfile(UUID.fromString("00000000-0000-0000-0000-000000000000"), "TurretFake");
+
+    private static final EntityDataAccessor<Float> DATA_YAW =
+            SynchedEntityData.defineId(TurretHeadEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Float> DATA_PITCH =
+            SynchedEntityData.defineId(TurretHeadEntity.class, EntityDataSerializers.FLOAT);
 
     private BlockPos basePos;
     private int ticksSinceSpawn = 0;
+    private int attackCooldown = 0;
+
+    private final TurretAiming aiming = new TurretAiming(this);
+    private final TurretShooting shooting = new TurretShooting(this, this.aiming);
+
+    private FakePlayer fakePlayer;
+    @Nullable
+    private LivingEntity cachedTarget;
 
     public TurretHeadEntity(EntityType<? extends TurretHeadEntity> type, Level level) {
         super(type, level);
-        this.noPhysics = true; // Щоб не падала та не штовхалась
+        this.noPhysics = true;
     }
 
     public void setBasePos(BlockPos basePos) {
@@ -35,9 +67,33 @@ public class TurretHeadEntity extends Entity {
         return null;
     }
 
+    public ItemStackHandler getInventory() {
+        TurretBaseBlockEntity base = getBaseEntity();
+        return (base != null) ? base.getInventory() : new ItemStackHandler(1);
+    }
+
+    public ItemStack getWeapon() {
+        return getInventory().getStackInSlot(0);
+    }
+
+    public FakePlayer getFakePlayer() {
+        if (fakePlayer == null && this.level() instanceof ServerLevel serverLevel) {
+            fakePlayer = FakePlayerFactory.get(serverLevel, DUMMY_PROFILE);
+        }
+
+        if (fakePlayer != null) {
+            fakePlayer.setItemInHand(InteractionHand.MAIN_HAND, getWeapon());
+            fakePlayer.setPos(this.getX(), this.getY(), this.getZ());
+        }
+
+        return fakePlayer;
+    }
 
     @Override
-    protected void defineSynchedData() {}
+    protected void defineSynchedData() {
+        this.entityData.define(DATA_YAW, 0.0f);
+        this.entityData.define(DATA_PITCH, 0.0f);
+    }
 
     @Override
     protected void readAdditionalSaveData(CompoundTag tag) {
@@ -56,52 +112,61 @@ public class TurretHeadEntity extends Entity {
     }
 
     @Override
+    public void writeSpawnData(FriendlyByteBuf buffer) {}
+
+    @Override
+    public void readSpawnData(FriendlyByteBuf buffer) {}
+
+    @Override
     public void tick() {
         super.tick();
 
         if (this.level().isClientSide) return;
 
         ticksSinceSpawn++;
+        updatePositionWithBase();
 
+        if (ticksSinceSpawn > 40 && getBaseEntity() == null) {
+            LOGGER.warn("Base not found! Removing turret head.");
+            this.discard();
+            return;
+        }
+
+        updateTargetingAndAttack();
+    }
+
+    private void updatePositionWithBase() {
         if (basePos != null) {
             this.setPos(basePos.getX() + 0.5, basePos.getY() + 1.0, basePos.getZ() + 0.5);
         }
+    }
 
-        // Дати 40 тік (2 секунди) на пошук бази
-        if (ticksSinceSpawn > 40) {
-            TurretBaseBlockEntity base = getBaseEntity();
-            if (base != null) {
-                // Turret працює
-            } else {
-                System.out.println("Base not found! Removing turret head.");
-                this.discard();
-                return;
+    private void updateTargetingAndAttack() {
+        cachedTarget = aiming.findTarget();
+
+        if (cachedTarget != null) {
+            aiming.lookAtTarget(cachedTarget);
+
+            // Зберігаємо yaw/pitch для рендеру
+            this.entityData.set(DATA_YAW, this.getYRot());
+            this.entityData.set(DATA_PITCH, this.getXRot());
+
+            ItemStack weapon = getWeapon();
+            if (!weapon.isEmpty() && --attackCooldown <= 0) {
+                FakePlayer fakePlayer = getFakePlayer();
+                if (fakePlayer != null) {
+                    shooting.shootAt(cachedTarget);
+                }
+                attackCooldown = 20;
             }
-        }
-
-        // Проста логіка наведення
-        LivingEntity target = this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(8.0),
-                        e -> e != null && e.isAlive() && !e.getType().equals(this.getType()))
-                .stream().findFirst().orElse(null);
-
-        if (target != null) {
-            this.lookAt(target);
         }
     }
 
+    public float getRenderYaw() {
+        return this.entityData.get(DATA_YAW);
+    }
 
-    private void lookAt(LivingEntity target) {
-        double dx = target.getX() - this.getX();
-        double dz = target.getZ() - this.getZ();
-        double dy = target.getEyeY() - this.getEyeY();
-
-        double dist = Math.sqrt(dx * dx + dz * dz);
-        float yaw = (float)(Math.toDegrees(Math.atan2(dz, dx))) - 90F;
-        float pitch = (float)(-Math.toDegrees(Math.atan2(dy, dist)));
-
-        this.setYRot(yaw);
-        this.setXRot(pitch);
-        this.yRotO = yaw;
-        this.xRotO = pitch;
+    public float getRenderPitch() {
+        return this.entityData.get(DATA_PITCH);
     }
 }

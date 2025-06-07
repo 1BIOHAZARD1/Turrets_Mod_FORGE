@@ -10,6 +10,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.items.ItemStackHandler;
 import net.oleksandr.custom_turrets.registry.ModBlockEntities;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -23,6 +24,14 @@ public class TurretBaseBlockEntity extends BlockEntity implements MenuProvider, 
 
 
     private final NonNullList<ItemStack> items = NonNullList.withSize(9, ItemStack.EMPTY); // інвентар на 9 слотів
+
+    private final ItemStackHandler itemHandler = new ItemStackHandler(9); // приклад
+
+    public ItemStackHandler getInventory() {
+        return itemHandler;
+    }
+
+
 
     @Override
     public int getContainerSize() {

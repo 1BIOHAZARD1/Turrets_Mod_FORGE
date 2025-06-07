@@ -26,8 +26,10 @@ public class TurretAiming {
                         turret.getBoundingBox().inflate(16),
                         this::isValidTarget)
                 .stream()
+                .sorted((a, b) -> Double.compare(a.distanceToSqr(turret), b.distanceToSqr(turret)))
                 .findFirst()
                 .orElse(null);
+
     }
 
     private boolean isVisible(LivingEntity target) {
@@ -35,7 +37,7 @@ public class TurretAiming {
         Vec3 end = target.getEyePosition();
         HitResult result = turret.level().clip(new ClipContext(start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, turret));
 
-        return result.getType() == HitResult.Type.MISS || result.getLocation().distanceToSqr(end) < 0.1;
+        return result.getType() == HitResult.Type.MISS || result.getLocation().distanceToSqr(end) < 1.0;
     }
 
     public void lookAtTarget(LivingEntity target) {
