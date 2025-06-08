@@ -17,31 +17,28 @@ public class TurretShooting {
     public void shootAt(LivingEntity target) {
         if (target == null || !target.isAlive()) return;
 
-        var level = turret.level();
         var weapon = turret.getWeapon();
-
         if (weapon.isEmpty()) return;
 
         var fakePlayer = turret.getFakePlayer();
         if (fakePlayer == null) return;
 
+        // Встановлюємо зброю
         fakePlayer.setItemInHand(InteractionHand.MAIN_HAND, weapon);
 
+        // Прицілюємось
         float[] angles = aiming.getAimAngles(target);
-        float yaw = angles[0];
-        float pitch = angles[1];
+        fakePlayer.setYRot(angles[0]);
+        fakePlayer.setXRot(angles[1]);
+        fakePlayer.yRotO = angles[0];
+        fakePlayer.xRotO = angles[1];
 
-        fakePlayer.setYRot(yaw);
-        fakePlayer.setXRot(pitch);
-        fakePlayer.yRotO = yaw;
-        fakePlayer.xRotO = pitch;
+        // Симуляція пострілу (імітація кліку ЛКМ)
+        fakePlayer.swing(InteractionHand.MAIN_HAND); // анімація атаки
+        fakePlayer.attack(fakePlayer); // так T&C перевіряє власника зброї — використовує `shooter instanceof Player`
 
-        var result = weapon.use(level, fakePlayer, InteractionHand.MAIN_HAND);
-        if (!result.getResult().consumesAction()) {
-            System.out.println("Turret weapon use did not consume action.");
-        }
-
-
-        turret.playSound(SoundEvents.ARROW_SHOOT, 1.0F, 1.0F);
+        // Гарантуємо, що фейковий гравець отримує тік
+        fakePlayer.tick();
     }
 }
+
