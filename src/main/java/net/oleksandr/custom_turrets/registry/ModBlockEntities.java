@@ -9,9 +9,11 @@ import net.oleksandr.custom_turrets.block.TurretBaseBlockEntity;
 import net.minecraftforge.eventbus.api.IEventBus;
 
 public class ModBlockEntities {
+    // Register block entities
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES =
             DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, TurretsMod.MOD_ID);
 
+    // Turret base block entity
     public static final RegistryObject<BlockEntityType<TurretBaseBlockEntity>> TURRET_BASE =
             BLOCK_ENTITIES.register("turret_base", () ->
                     BlockEntityType.Builder.of(TurretBaseBlockEntity::new,

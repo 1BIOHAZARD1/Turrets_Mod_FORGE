@@ -16,11 +16,11 @@ import net.oleksandr.custom_turrets.TurretsMod;
 @Mod.EventBusSubscriber(modid = TurretsMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ModCreativeTabs {
 
-    // 1. Регістрація вкладки
+    // Creative tab register
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS =
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, TurretsMod.MOD_ID);
 
-    // 2. Вкладка без предметів
+    // Custom tab
     public static final RegistryObject<CreativeModeTab> CUSTOM_TURRETS_TAB =
             CREATIVE_MODE_TABS.register("custom_turrets_tab",
                     () -> CreativeModeTab.builder()
@@ -33,18 +33,16 @@ public class ModCreativeTabs {
                             .build()
             );
 
-    // 3. Реєстрація регістру вкладок
+    // Register tab
     public static void register(IEventBus eventBus) {
         CREATIVE_MODE_TABS.register(eventBus);
     }
 
-    // 4. Додавання вмісту до вкладки
+    // Add items to tab
     @SubscribeEvent
     public static void onBuildContents(BuildCreativeModeTabContentsEvent event) {
         if (event.getTab() == CUSTOM_TURRETS_TAB.get()) {
             event.accept(ModBlocks.TURRET_BLOCK.get().asItem());
-
         }
     }
-
 }

@@ -36,9 +36,12 @@ import java.util.UUID;
 public class TurretHeadEntity extends Entity implements IEntityAdditionalSpawnData {
 
     private static final Logger LOGGER = LogUtils.getLogger();
+
+    // Fake player profile used for simulating player behavior
     private static final GameProfile DUMMY_PROFILE =
             new GameProfile(UUID.fromString("00000000-0000-0000-0000-000000000000"), "TurretFake");
 
+    // Synced data for rendering yaw and pitch on client
     private static final EntityDataAccessor<Float> DATA_YAW =
             SynchedEntityData.defineId(TurretHeadEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> DATA_PITCH =
@@ -55,17 +58,18 @@ public class TurretHeadEntity extends Entity implements IEntityAdditionalSpawnDa
     @Nullable
     private LivingEntity cachedTarget;
 
-
     public TurretHeadEntity(EntityType<? extends TurretHeadEntity> type, Level level) {
         super(type, level);
-        this.noPhysics = true;
+        this.noPhysics = true; // Turret should not be affected by physics
     }
 
+    // Sets position based on base block position
     public void setBasePos(BlockPos basePos) {
         this.basePos = basePos;
         this.setPos(basePos.getX() + 0.5, basePos.getY() + 1.0, basePos.getZ() + 0.5);
     }
 
+    // Gets associated base block entity
     @Nullable
     public TurretBaseBlockEntity getBaseEntity() {
         if (basePos != null && this.level().getBlockEntity(basePos) instanceof TurretBaseBlockEntity be) {
@@ -79,6 +83,7 @@ public class TurretHeadEntity extends Entity implements IEntityAdditionalSpawnDa
         return (base != null) ? base.getInventory() : new ItemStackHandler(1);
     }
 
+    // Finds first non-empty weapon item in the base inventory
     public ItemStack getWeapon() {
         TurretBaseBlockEntity base = getBaseEntity();
         if (base == null) {
@@ -99,11 +104,7 @@ public class TurretHeadEntity extends Entity implements IEntityAdditionalSpawnDa
         return ItemStack.EMPTY;
     }
 
-
-
-
-
-
+    // Initializes and updates a fake player to simulate weapon use
     public FakePlayer getFakePlayer() {
         if (fakePlayer == null && this.level() instanceof ServerLevel serverLevel) {
             fakePlayer = FakePlayerFactory.get(serverLevel, DUMMY_PROFILE);
@@ -139,6 +140,7 @@ public class TurretHeadEntity extends Entity implements IEntityAdditionalSpawnDa
         }
     }
 
+    // Used to sync extra data when entity is spawned on the client
     @Override
     public void writeSpawnData(FriendlyByteBuf buffer) {
         buffer.writeBlockPos(basePos != null ? basePos : BlockPos.ZERO);
@@ -149,14 +151,11 @@ public class TurretHeadEntity extends Entity implements IEntityAdditionalSpawnDa
         basePos = buffer.readBlockPos();
     }
 
+    // Handles network spawning
     @Override
     public Packet<ClientGamePacketListener> getAddEntityPacket() {
         return NetworkHooks.getEntitySpawningPacket(this);
     }
-
-
-
-
 
     @Override
     public void tick() {
@@ -167,6 +166,7 @@ public class TurretHeadEntity extends Entity implements IEntityAdditionalSpawnDa
         ticksSinceSpawn++;
         updatePositionWithBase();
 
+        // Remove if no base block after a few ticks
         if (ticksSinceSpawn > 40 && getBaseEntity() == null) {
             LOGGER.warn("Base not found! Removing turret head.");
             this.discard();
@@ -188,7 +188,7 @@ public class TurretHeadEntity extends Entity implements IEntityAdditionalSpawnDa
         if (cachedTarget != null) {
             aiming.lookAtTarget(cachedTarget);
 
-            // Зберігаємо yaw/pitch для рендеру
+            // Sync aiming angles to client for rendering
             this.entityData.set(DATA_YAW, this.getYRot());
             this.entityData.set(DATA_PITCH, this.getXRot());
 
@@ -203,6 +203,7 @@ public class TurretHeadEntity extends Entity implements IEntityAdditionalSpawnDa
         }
     }
 
+    // Used by renderer to get smooth yaw/pitch
     public float getRenderYaw() {
         return this.entityData.get(DATA_YAW);
     }

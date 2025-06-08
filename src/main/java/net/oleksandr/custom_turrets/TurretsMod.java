@@ -14,11 +14,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.oleksandr.custom_turrets.client.renderer.TurretHeadRenderer;
 import net.oleksandr.custom_turrets.registry.*;
-import net.oleksandr.custom_turrets.registry.ModCreativeTabs;
-
-
 import org.slf4j.Logger;
 
 @Mod(TurretsMod.MOD_ID)
@@ -29,8 +25,7 @@ public class TurretsMod {
     public TurretsMod() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
-        // Реєстрація
-
+        // Register content
         ModMenus.register(modEventBus);
         ModBlocks.register(modEventBus);
         ModItems.register(modEventBus);
@@ -38,8 +33,7 @@ public class TurretsMod {
         ModEntities.ENTITY_TYPES.register(modEventBus);
         ModCreativeTabs.register(modEventBus);
 
-
-        // Події
+        // Register events
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::addCreative);
 
@@ -47,19 +41,18 @@ public class TurretsMod {
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
-        // Для загального сетапу
+        // Common setup
     }
 
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
-        // Додаткове додавання до стандартних вкладок (наприклад Functional)
-        if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
-            //ModBlocks.TURRET_BLOCK.ifPresent(block ->
-            //        event.accept(new ItemStack(block.asItem(), 1)));
-        }
+        // Add items to vanilla tabs if needed
+        // if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
+        //     event.accept(ModBlocks.TURRET_BLOCK.get().asItem());
+        // }
     }
 
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
-        // Можна залишити порожнім
+        // Server start logic
     }
 }

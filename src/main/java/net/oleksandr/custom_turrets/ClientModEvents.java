@@ -13,24 +13,23 @@ import net.oleksandr.custom_turrets.client.screen.TurretBaseScreen;
 import net.oleksandr.custom_turrets.registry.ModEntities;
 import net.oleksandr.custom_turrets.registry.ModMenus;
 
-
-
-// Subscribes to client-side mod events
 @Mod.EventBusSubscriber(modid = TurretsMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ClientModEvents {
 
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
-            // Registers the GUI screen for the turret base block
+            // GUI for turret block
             MenuScreens.register(ModMenus.TURRET_BASE_MENU.get(), TurretBaseScreen::new);
 
-            // Registers the renderer for the TurretHeadEntity
+            // Renderer for turret entity
             EntityRenderers.register(ModEntities.TURRET_HEAD.get(), TurretHeadRenderer::new);
         });
     }
+
     @SubscribeEvent
     public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
+        // Model layer for turret entity
         event.registerLayerDefinition(
                 TurretHeadModel.LAYER_LOCATION,
                 TurretHeadModel::createBodyLayer

@@ -19,12 +19,13 @@ public class ModItems {
 
     private static final Map<String, RegistryObject<? extends Block>> BLOCK_ITEMS_TO_REGISTER = new HashMap<>();
 
+    // Stores block references for item auto-registration
     public static void registerBlockItem(String name, RegistryObject<? extends Block> block) {
         BLOCK_ITEMS_TO_REGISTER.put(name, block);
     }
 
+    // Registers all items and block items
     public static void register(IEventBus eventBus) {
-        // Реєстрація всіх BlockItem'ів
         for (Map.Entry<String, RegistryObject<? extends Block>> entry : BLOCK_ITEMS_TO_REGISTER.entrySet()) {
             ITEMS.register(entry.getKey(), () ->
                     new BlockItem(entry.getValue().get(), new Properties()));

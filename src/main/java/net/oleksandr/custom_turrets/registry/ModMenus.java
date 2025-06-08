@@ -13,10 +13,12 @@ public class ModMenus {
     public static final DeferredRegister<MenuType<?>> MENUS =
             DeferredRegister.create(ForgeRegistries.MENU_TYPES, TurretsMod.MOD_ID);
 
+    // GUI menu for turret block
     public static final RegistryObject<MenuType<TurretBaseMenu>> TURRET_BASE_MENU =
             MENUS.register("turret_base_menu", () ->
                     IForgeMenuType.create(TurretBaseMenu::new));
 
+    // Registers all menus
     public static void register(IEventBus eventBus) {
         MENUS.register(eventBus);
     }
