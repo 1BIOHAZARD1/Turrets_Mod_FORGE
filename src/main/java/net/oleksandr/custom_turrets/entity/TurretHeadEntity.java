@@ -196,9 +196,9 @@ public class TurretHeadEntity extends Entity implements IEntityAdditionalSpawnDa
             if (!weapon.isEmpty() && --attackCooldown <= 0) {
                 FakePlayer fakePlayer = getFakePlayer();
                 if (fakePlayer != null) {
-                    shooting.shootAt(cachedTarget);
+                    shooting.tickShooting(cachedTarget);
                 }
-                attackCooldown = 20;
+                attackCooldown = 4;
             }
         }
     }
