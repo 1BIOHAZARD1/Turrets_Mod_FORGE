@@ -8,7 +8,7 @@ public class TurretShooting {
     private final TurretHeadEntity turret;
     private final TurretAiming aiming;
 
-    private static final float DAMAGE = 9.0f;
+    private static final float DAMAGE = 11.0f;
     private static final int FIRE_RATE_TICKS = 5; // стріляє кожні 5 тік (~4 рази/сек)
     private int cooldown = 0;
 
