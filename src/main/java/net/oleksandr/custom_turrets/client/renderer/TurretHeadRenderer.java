@@ -53,7 +53,8 @@ public class TurretHeadRenderer extends EntityRenderer<TurretHeadEntity> {
             poseStack.pushPose();
 
             // Позиція і масштаб предмета
-            poseStack.translate(0.0, 0.2, 0.3); // Зміни позицію при потребі
+            poseStack.translate(0.0, 0.2, 0.0); // Зміни позицію при потребі
+            poseStack.mulPose(Axis.YP.rotationDegrees(180));
             poseStack.scale(1.5f, 1.5f, 1.5f); // Масштаб
             Minecraft.getInstance().getItemRenderer().renderStatic(
                     weapon,
